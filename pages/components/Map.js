@@ -7,7 +7,8 @@ import { WrappedBuildError } from "next/dist/server/base-server";
 mapboxgl.accessToken =
   "pk.eyJ1IjoiZGF0bmV3MzUxNzY5NjkiLCJhIjoiY2w2bWdwbzZ3MGxtYTNkbnR0ZHM5eWI2aCJ9.iR7dEh-z2szHHsq2qSpBPw";
 
-const Map = () => {
+const Map = (props) => {
+  console.log(props);
   useEffect(() => {
     // if (map.current) return; // initialize map only once
     const map = new mapboxgl.Map({
@@ -17,10 +18,22 @@ const Map = () => {
       zoom: 3,
     });
 
-    const marker1 = new mapboxgl.Marker()
-      .setLngLat([-92.04936651800563, 30.159215528394085])
-      .addTo(map);
-  });
+    if (props.pickupCoordinates) {
+      addToMap(map, props.pickupCoordinates);
+    }
+    if (props.dropoffCoordinates) {
+      addToMap(map, props.dropoffCoordinates);
+    }
+
+    if (props.pickupCoordinates && props.dropoffCoordinates) {
+      map.fitBounds([props.dropoffCoordinates, props.pickupCoordinates], {
+        padding: 80,
+      });
+    }
+  }, [props.pickupCoordinates, props.dropoffCoordinates]);
+  const addToMap = (map, coordinate) => {
+    const marker1 = new mapboxgl.Marker().setLngLat(coordinate).addTo(map);
+  };
 
   return <Wrapper id="map"></Wrapper>;
 };
